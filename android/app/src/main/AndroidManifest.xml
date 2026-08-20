@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.dex_wallet">
+    package="com.paynova.dex">
 
     <!-- Network access -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
     <application
-        android:label="dex_wallet"
+        android:label="Paynova Dex"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
