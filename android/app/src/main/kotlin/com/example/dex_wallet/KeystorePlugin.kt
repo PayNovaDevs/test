@@ -1,4 +1,4 @@
-package com.example.dex_wallet
+package com.paynova.dex
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -18,7 +18,7 @@ class KeystorePlugin: FlutterPlugin, MethodChannel.MethodCallHandler {
   private val ANDROID_KEYSTORE = "AndroidKeyStore"
 
   override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(binding.binaryMessenger, "com.example.dex_wallet/keystore")
+    channel = MethodChannel(binding.binaryMessenger, "com.paynova.dex/keystore")
     channel.setMethodCallHandler(this)
   }
 
