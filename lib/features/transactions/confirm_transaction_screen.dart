@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../features/transactions/pin_entry_dialog.dart';
+
 class TransactionConfirmationScreen extends StatelessWidget {
   final String to;
   final String value; // hex or decimal string
@@ -9,6 +11,13 @@ class TransactionConfirmationScreen extends StatelessWidget {
   final VoidCallback onReject;
 
   const TransactionConfirmationScreen({Key? key, required this.to, required this.value, required this.gasLimit, required this.gasPriceHex, required this.onApprove, required this.onReject}) : super(key: key);
+
+  Future<void> _handleApprove(BuildContext context) async {
+    final confirmed = await showDialog<bool>(context: context, builder: (_) => const PinEntryDialog());
+    if (confirmed == true) {
+      onApprove();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +46,7 @@ class TransactionConfirmationScreen extends StatelessWidget {
           Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             TextButton(onPressed: onReject, child: const Text('Reject')),
             const SizedBox(width: 12),
-            ElevatedButton(onPressed: onApprove, child: const Text('Approve')),
+            ElevatedButton(onPressed: () => _handleApprove(context), child: const Text('Approve')),
           ])
         ]),
       ),

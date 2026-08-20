@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_theme.dart';
+import '../../widgets/sparkline.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/skeleton_loader.dart';
 
@@ -10,6 +10,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final sampleData = [1.0, 1.2, 1.15, 1.4, 1.3, 1.6, 1.55, 1.7];
     return Scaffold(
       appBar: AppBar(
         title: const Text('dex wallet'),
@@ -32,11 +33,10 @@ class HomeScreen extends StatelessWidget {
                   SizedBox(height: 6),
                   Text('≈ USD 3,456.78', style: TextStyle(color: Colors.white54)),
                 ]),
-                Container(
+                SizedBox(
                   width: 120,
                   height: 48,
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(8)),
-                  child: Center(child: Text('Mini‑chart', style: TextStyle(color: Colors.white24))),
+                  child: Sparkline(data: sampleData, lineColor: theme.colorScheme.primary),
                 )
               ])
             ]),
