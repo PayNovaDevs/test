@@ -27,6 +27,7 @@ dependencies:
   walletconnect_dart: ^1.0.0
   flutter_dotenv: ^5.0.2
   walletconnect_flutter_v2: ^0.1.0
+  pointycastle: ^3.4.0
 
 dev_dependencies:
   flutter_test:

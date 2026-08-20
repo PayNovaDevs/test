@@ -8,6 +8,7 @@ import '../../core/hd/impl/hd_wallet_service_impl.dart';
 import '../../core/hd/hd_wallet_service.dart';
 import '../../core/network/rpc_manager.dart';
 import '../../features/networks/networks_service.dart';
+import '../../features/transactions/pin_entry_dialog.dart';
 
 class SendScreen extends StatefulWidget {
   final String fromAddress;
@@ -62,26 +63,17 @@ class _SendScreenState extends State<SendScreen> {
       if (net.rpcUrl.isEmpty) throw Exception('No RPC configured for ${net.name}');
 
       final rpc = RpcManager(net);
-      final hd = HdWalletServiceImpl(rpc is RpcManager ? rpc._network != null ? rpc._network as dynamic? : null : null); // placeholder to satisfy type
-      // NOTE: HdWalletServiceImpl requires SecureStorageService; we'll instantiate directly
-      final hdsvc = HdWalletServiceImpl(rpc._network == null ? throw Exception('invalid') : HdWalletServiceImpl._secureStoragePlaceholder);
-    } catch (e) {
-      // The above placeholder code can't be compiled — we'll use direct implementations below.
-    }
-
-    try {
-      final ns = NetworksService();
-      final net = ns.activeNetwork;
-      if (net == null) throw Exception('No active network');
-      final rpc = RpcManager(net);
+      final web3 = Web3Client(net.rpcUrl, Client());
 
       final to = _toCtrl.text.trim();
       if (to.isEmpty) throw Exception('Missing destination address');
 
+      // Require PIN/biometric before proceeding
+      final authOk = await showDialog<bool>(context: context, builder: (_) => const PinEntryDialog()) ?? false;
+      if (!authOk) throw Exception('Authentication required');
+
       if (!_isToken) {
-        // Native transfer
         final amountWei = _parseAmountToUint(_amountCtrl.text.trim(), net.decimals);
-        // get nonce
         final nonceHex = await rpc.getNonce(widget.fromAddress);
         final nonce = int.parse(nonceHex.substring(2), radix: 16);
         final gasPriceHex = await rpc.gasPrice();
@@ -93,13 +85,51 @@ class _SendScreenState extends State<SendScreen> {
           maxGas: 21000,
           nonce: nonce,
         );
-        // sign
-        final storage = HdWalletServiceImpl._secureStoragePlaceholder; // placeholder
+
+        final hd = HdWalletServiceImpl(SecureStorageService());
+        final signedHex = await hd.signTransactionObject(tx, widget.fromIndex, net.chainId);
+        final txHash = await rpc.sendRawTransaction(signedHex);
+
+        setState(() {
+          _status = 'Sent: $txHash';
+        });
+      } else {
+        final tokenAddr = _tokenCtrl.text.trim();
+        if (tokenAddr.isEmpty) throw Exception('Missing token contract address');
+
+        final contract = DeployedContract(ContractAbi.fromJson(_erc20Abi, 'ERC20'), EthereumAddress.fromHex(tokenAddr));
+        final transferFn = contract.function('transfer');
+
+        // discover decimals via on-chain call
+        final decimalsCall = await web3.call(contract: contract, function: contract.function('decimals'), params: []);
+        final decimals = decimalsCall.isNotEmpty ? (decimalsCall.first as BigInt).toInt() : 18;
+
+        final amount = _parseAmountToUint(_amountCtrl.text.trim(), decimals);
+
+        final nonceHex = await rpc.getNonce(widget.fromAddress);
+        final nonce = int.parse(nonceHex.substring(2), radix: 16);
+        final gasPriceHex = await rpc.gasPrice();
+        final gasPrice = BigInt.parse(gasPriceHex.substring(2), radix: 16);
+
+        final tx = Transaction.callContract(
+          contract: contract,
+          function: transferFn,
+          parameters: [EthereumAddress.fromHex(to), amount],
+          maxGas: 100000,
+          gasPrice: EtherAmount.inWei(gasPrice),
+          nonce: nonce,
+        );
+
+        final hd = HdWalletServiceImpl(SecureStorageService());
+        final signedHex = await hd.signTransactionObject(tx, widget.fromIndex, net.chainId);
+        final txHash = await rpc.sendRawTransaction(signedHex);
+
+        setState(() {
+          _status = 'ERC20 sent: $txHash';
+        });
       }
 
-      setState(() {
-        _status = 'Not implemented in UI placeholder';
-      });
+      web3.dispose();
     } catch (e) {
       setState(() {
         _status = 'Error: ${e.toString()}';
@@ -108,6 +138,14 @@ class _SendScreenState extends State<SendScreen> {
       setState(() => _loading = false);
     }
   }
+
+  static const _erc20Abi = '''[
+  {"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"type":"function"},
+  {"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"type":"function"},
+  {"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"type":"function"},
+  {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
+  {"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"type":"function"}
+]''';
 
   @override
   Widget build(BuildContext context) {
