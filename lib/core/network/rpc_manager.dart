@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+
 import '../models/network_config.dart';
 
 class RpcException implements Exception {
@@ -25,10 +28,11 @@ class RpcManager {
   }
 
   Future<dynamic> _postRpc(String method, List params) async {
-    final body = {'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params};
+    final body = {'jsonrpc': '2.0', 'id': DateTime.now().millisecondsSinceEpoch, 'method': method, 'params': params};
     try {
       final r = await _dio.post('', data: body);
       if (r.statusCode == 200) {
+        if (r.data['error'] != null) throw RpcException(r.data['error'].toString());
         return r.data;
       } else {
         throw RpcException('RPC error: ${r.statusCode}');
@@ -54,10 +58,30 @@ class RpcManager {
     return int.parse(hex.substring(2), radix: 16);
   }
 
-  Future<String> getTransactionByHash(String txHash) async {
+  Future<dynamic> getTransactionByHash(String txHash) async {
     final resp = await _postRpc('eth_getTransactionByHash', [txHash]);
+    return resp['result'];
+  }
+
+  Future<String> estimateGas(Map<String, dynamic> tx) async {
+    final resp = await _postRpc('eth_estimateGas', [tx]);
     return resp['result'] as String;
   }
 
-  // TODO: add estimateGas, getLogs, getNonce, getTokenBalance utilities
+  Future<String> getNonce(String address) async {
+    final resp = await _postRpc('eth_getTransactionCount', [address, 'pending']);
+    return resp['result'] as String;
+  }
+
+  Future<dynamic> getLogs(Map<String, dynamic> filter) async {
+    final resp = await _postRpc('eth_getLogs', [filter]);
+    return resp['result'];
+  }
+
+  Future<dynamic> ethCall(Map<String, dynamic> call, {String block = 'latest'}) async {
+    final resp = await _postRpc('eth_call', [call, block]);
+    return resp['result'];
+  }
+
+  // TODO: add getTokenBalance helper using eth_call (handled in TokenRegistry)
 }
