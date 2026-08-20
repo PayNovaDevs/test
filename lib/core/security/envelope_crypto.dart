@@ -61,6 +61,21 @@ class EnvelopeCrypto {
     }
   }
 
+  /// Migrate a legacy plaintext seed (if present) into the new envelope+native-wrapped scheme.
+  /// If a legacy seed is found it will be encrypted and the legacy key removed.
+  static Future<void> migrateLegacySeedIfNeeded(SecureStorageService storage) async {
+    const legacyKey = 'vault_seed_hex';
+    try {
+      final legacy = await storage.read(legacyKey);
+      if (legacy != null && legacy.isNotEmpty) {
+        await storeEncryptedSeed(storage, legacy);
+        await storage.delete(legacyKey);
+      }
+    } catch (_) {
+      // ignore migration errors, continue
+    }
+  }
+
   static List<int> _hexDecode(String hex) {
     var h = hex;
     if (h.startsWith('0x')) h = h.substring(2);

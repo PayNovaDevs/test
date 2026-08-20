@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import '../models/network_config.dart';
 import '../../security/secure_storage_service.dart';
+import '../../security/envelope_crypto.dart';
 
 /// AppConfig loads networks from assets and allows runtime overrides persisted locally.
 class AppConfig {
@@ -16,6 +17,9 @@ class AppConfig {
 
   /// Load default networks from assets and merge with any saved overrides.
   Future<void> load() async {
+    // migrate any legacy plaintext seed into encrypted keystore-backed envelope
+    await EnvelopeCrypto.migrateLegacySeedIfNeeded(_storage);
+
     final raw = await rootBundle.loadString('assets/networks.json');
     final parsed = jsonDecode(raw) as List<dynamic>;
     _networks = parsed.map((e) => _fromJson(e as Map<String, dynamic>)).toList();
