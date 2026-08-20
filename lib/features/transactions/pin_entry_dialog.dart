@@ -70,7 +70,10 @@ class _PinEntryDialogState extends State<PinEntryDialog> {
     try {
       final canAuthenticate = await _localAuth.canCheckBiometrics || await _localAuth.isDeviceSupported();
       if (!canAuthenticate) return false;
-      final didAuthenticate = await _localAuth.authenticate(localizedReason: 'Authenticate to approve transaction', biometricOnly: false);
+      final didAuthenticate = await _localAuth.authenticate(
+        localizedReason: 'Authenticate to approve transaction',
+        biometricOnly: false,
+      );
       return didAuthenticate;
     } catch (_) {
       return false;
@@ -136,7 +139,13 @@ class _PinEntryDialogState extends State<PinEntryDialog> {
         if (_locked && _lockedUntil != null) ...[
           Text('${loc.translate('pin_locked_until')} ${_lockedUntil?.toLocal().toString()}'),
         ] else ...[
-          TextField(controller: _controller, keyboardType: TextInputType.number, obscureText: true, maxLength: 6, decoration: InputDecoration(errorText: _error)),
+          TextField(
+            controller: _controller,
+            keyboardType: TextInputType.number,
+            obscureText: true,
+            maxLength: 6,
+            decoration: InputDecoration(errorText: _error),
+          ),
         ]
       ]),
       actions: [
