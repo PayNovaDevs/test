@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "welcome_title": "Welcome to dex wallet",
+  "welcome_subtitle": "A premium non-custodial wallet for EVM networks.",
+  "create_wallet": "Create Wallet",
+  "import_wallet": "Import Wallet",
+  "onboarding_security_title": "Security",
+  "onboarding_security_body": "Your seed never leaves the device.",
+  "onboarding_control_title": "Control",
+  "onboarding_control_body": "Manage multiple accounts and networks.",
+  "onboarding_integrations_title": "Integrations",
+  "onboarding_integrations_body": "Connect DApps using WalletConnect.",
+  "next": "Next",
+  "get_started": "Get started"
+}
