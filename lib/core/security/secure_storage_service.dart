@@ -1,22 +1,14 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// A small wrapper around flutter_secure_storage to centralize platform options.
+/// Simple wrapper around flutter_secure_storage to centralize usage.
 class SecureStorageService {
-  final FlutterSecureStorage _storage;
-  SecureStorageService({FlutterSecureStorage? storage}) : _storage = storage ?? const FlutterSecureStorage();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
-  Future<void> write(String key, String value) async {
-    await _storage.write(key: key, value: value, iOptions: _iosOptions(), aOptions: _androidOptions());
-  }
+  Future<void> write(String key, String value) => _storage.write(key: key, value: value);
 
-  Future<String?> read(String key) async {
-    return _storage.read(key: key, iOptions: _iosOptions(), aOptions: _androidOptions());
-  }
+  Future<String?> read(String key) => _storage.read(key: key);
 
-  Future<void> delete(String key) async {
-    await _storage.delete(key: key, iOptions: _iosOptions(), aOptions: _androidOptions());
-  }
+  Future<void> delete(String key) => _storage.delete(key: key);
 
-  AndroidOptions _androidOptions() => const AndroidOptions(encryptedSharedPreferences: true);
-  IOSOptions _iosOptions() => const IOSOptions(accessibility: IOSAccessibility.first_unlock_this_device);
+  Future<void> deleteAll() => _storage.deleteAll();
 }
