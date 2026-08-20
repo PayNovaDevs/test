@@ -6,6 +6,8 @@ import '../core/hd/impl/hd_wallet_service_impl.dart';
 import '../core/hd/hd_wallet_service.dart';
 import '../core/network/rpc_manager.dart';
 import '../core/models/network_config.dart';
+import '../core/dapps/wallet_connect_v1_impl.dart';
+import '../core/dapps/wallet_connect_manager.dart';
 
 final secureStorageProvider = Provider<SecureStorageService>((ref) => SecureStorageService());
 
@@ -24,6 +26,23 @@ final defaultNetworkProvider = Provider<NetworkConfig>((ref) => NetworkConfig(
     ));
 
 final rpcManagerProvider = Provider<RpcManager>((ref) => RpcManager(ref.read(defaultNetworkProvider)));
+
+// WalletConnect manager: creates the v1 impl and wraps it
+final walletConnectServiceProvider = Provider<WalletConnectV1Impl>((ref) {
+  final svc = WalletConnectV1Impl();
+  svc.init();
+  return svc;
+});
+
+final walletConnectManagerProvider = Provider<WalletConnectManager>((ref) {
+  final svc = ref.read(walletConnectServiceProvider);
+  final manager = WalletConnectManager(svc);
+  manager.init();
+  ref.onDispose(() {
+    manager.dispose();
+  });
+  return manager;
+});
 
 // Locale management: persisted in secure storage under key 'app_lang'
 class LocaleNotifier extends StateNotifier<Locale> {
