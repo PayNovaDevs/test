@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../l10n/app_localizations.dart';
+
 class ScanQrScreen extends StatefulWidget {
   const ScanQrScreen({Key? key}) : super(key: key);
 
@@ -20,8 +22,9 @@ class _ScanQrScreenState extends State<ScanQrScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan QR')),
+      appBar: AppBar(title: Text(loc.translate('scan_qr_title'))),
       body: Stack(children: [
         MobileScanner(
           controller: _controller,
@@ -38,7 +41,7 @@ class _ScanQrScreenState extends State<ScanQrScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               color: Colors.black54,
-              child: Text('Result: $_result', style: const TextStyle(color: Colors.white)),
+              child: Text('${loc.translate('scan_result')}: $_result', style: const TextStyle(color: Colors.white)),
             ),
           )
       ]),

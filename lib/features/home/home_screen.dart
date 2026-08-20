@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../widgets/sparkline.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/skeleton_loader.dart';
@@ -10,10 +11,11 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final loc = AppLocalizations.of(context);
     final sampleData = [1.0, 1.2, 1.15, 1.4, 1.3, 1.6, 1.55, 1.7];
     return Scaffold(
       appBar: AppBar(
-        title: const Text('dex wallet'),
+        title: Text(loc.translate('app_title')),
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
@@ -25,7 +27,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           GlassCard(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('Balance', style: TextStyle(color: Colors.white70)),
+              Text(loc.translate('balance_label'), style: const TextStyle(color: Colors.white70)),
               const SizedBox(height: 8),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
@@ -42,7 +44,7 @@ class HomeScreen extends StatelessWidget {
             ]),
           ),
           const SizedBox(height: 16),
-          const Text('Tokens', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(loc.translate('tokens_label'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Expanded(
             child: ListView.separated(
@@ -64,7 +66,7 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
-        label: const Text('Send'),
+        label: Text(loc.translate('send_button')),
         icon: const Icon(Icons.send),
       ),
     );

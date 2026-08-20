@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../features/transactions/pin_entry_dialog.dart';
 
 class TransactionConfirmationScreen extends StatelessWidget {
@@ -21,32 +22,33 @@ class TransactionConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     // Basic display of tx details. Caller should construct proper values.
     return Scaffold(
-      appBar: AppBar(title: const Text('Confirm Transaction')),
+      appBar: AppBar(title: Text(loc.translate('confirm_transaction_title'))),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('To', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(loc.translate('to_label'), style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text(to),
           const SizedBox(height: 12),
-          const Text('Value', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(loc.translate('value_label'), style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text(value),
           const SizedBox(height: 12),
-          const Text('Gas Limit', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(loc.translate('gas_limit_label'), style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text(gasLimit.toString()),
           const SizedBox(height: 12),
-          const Text('Gas Price (hex)', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(loc.translate('gas_price_label'), style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           Text(gasPriceHex),
           const Spacer(),
           Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            TextButton(onPressed: onReject, child: const Text('Reject')),
+            TextButton(onPressed: onReject, child: Text(loc.translate('reject'))),
             const SizedBox(width: 12),
-            ElevatedButton(onPressed: () => _handleApprove(context), child: const Text('Approve')),
+            ElevatedButton(onPressed: () => _handleApprove(context), child: Text(loc.translate('approve'))),
           ])
         ]),
       ),
