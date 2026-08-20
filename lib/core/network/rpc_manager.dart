@@ -83,5 +83,13 @@ class RpcManager {
     return resp['result'];
   }
 
-  // TODO: add getTokenBalance helper using eth_call (handled in TokenRegistry)
+  Future<dynamic> feeHistory(int blockCount, String newestBlock, List rewards) async {
+    final resp = await _postRpc('eth_feeHistory', ["$blockCount", newestBlock, rewards]);
+    return resp['result'];
+  }
+
+  Future<String> gasPrice() async {
+    final resp = await _postRpc('eth_gasPrice', []);
+    return resp['result'] as String;
+  }
 }

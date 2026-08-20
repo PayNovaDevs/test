@@ -5,7 +5,7 @@ class AddressUtils {
     if (!a.startsWith('0x')) return false;
     if (a.length != 42) return false;
     final hexPart = a.substring(2);
-    final validHex = RegExp(r'^[0-9a-f]{40}\$');
+    final validHex = RegExp(r'^[0-9a-f]{40}$');
     return validHex.hasMatch(hexPart);
   }
 }
