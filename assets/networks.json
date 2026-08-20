@@ -20,5 +20,27 @@
     "explorerUrl": "https://goerli.etherscan.io",
     "decimals": 18,
     "isTestnet": true
+  },
+  {
+    "id": "bsc",
+    "name": "Binance Smart Chain",
+    "chainId": 56,
+    "symbol": "BNB",
+    "rpcUrl": "",
+    "wsRpcUrl": null,
+    "explorerUrl": "https://bscscan.com",
+    "decimals": 18,
+    "isTestnet": false
+  },
+  {
+    "id": "bsc_testnet",
+    "name": "BSC Testnet",
+    "chainId": 97,
+    "symbol": "BNB",
+    "rpcUrl": "",
+    "wsRpcUrl": null,
+    "explorerUrl": "https://testnet.bscscan.com",
+    "decimals": 18,
+    "isTestnet": true
   }
 ]

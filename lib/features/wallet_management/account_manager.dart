@@ -3,17 +3,19 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../../core/security/secure_storage_service.dart';
+import '../../core/hd/hd_wallet_service.dart';
 import 'account_model.dart';
 
-/// Simple account manager that persists a list of derived accounts in secure storage.
-/// This is intentionally lightweight and for a production app you'd want to integrate
-/// with the HD wallet service and proper derivation paths.
+/// AccountManager enhanced to support deriving addresses from the HD wallet service
+/// and persisting accounts. If HdWalletService is available (seed stored), createDerivedAccount
+/// will derive an address for the next index; otherwise you can still create a manual account.
 class AccountManager with ChangeNotifier {
   static const _key = 'accounts_list_v1';
   final SecureStorageService _storage;
+  final HdWalletService? _hdService;
   final List<AccountModel> _accounts = [];
 
-  AccountManager(this._storage);
+  AccountManager(this._storage, {HdWalletService? hdService}) : _hdService = hdService;
 
   List<AccountModel> get accounts => List.unmodifiable(_accounts);
 
@@ -37,10 +39,22 @@ class AccountManager with ChangeNotifier {
     await _storage.write(_key, raw);
   }
 
-  /// Create a new placeholder account. In production this should derive from the seed.
+  /// Create a new manual account using the provided address.
   Future<AccountModel> createAccount({required String address, String? alias}) async {
     final idx = _accounts.isEmpty ? 0 : (_accounts.map((a) => a.index).reduce((a, b) => a > b ? a : b) + 1);
     final acc = AccountModel(address: address, index: idx, alias: alias ?? 'Account #${idx + 1}');
+    _accounts.add(acc);
+    await _persist();
+    notifyListeners();
+    return acc;
+  }
+
+  /// Create a derived account using the HD wallet service. If hdService is null or seed missing, throws.
+  Future<AccountModel> createDerivedAccount({String? alias}) async {
+    if (_hdService == null) throw Exception('HD wallet service not configured');
+    final nextIndex = _accounts.isEmpty ? 0 : (_accounts.map((a) => a.index).reduce((a, b) => a > b ? a : b) + 1);
+    final addr = await _hdService!.deriveAddressAt(nextIndex);
+    final acc = AccountModel(address: addr, index: nextIndex, alias: alias ?? 'Account #${nextIndex + 1}');
     _accounts.add(acc);
     await _persist();
     notifyListeners();
