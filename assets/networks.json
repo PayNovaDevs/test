@@ -1,0 +1,24 @@
+[
+  {
+    "id": "ethereum",
+    "name": "Ethereum Mainnet",
+    "chainId": 1,
+    "symbol": "ETH",
+    "rpcUrl": "",
+    "wsRpcUrl": "",
+    "explorerUrl": "https://etherscan.io",
+    "decimals": 18,
+    "isTestnet": false
+  },
+  {
+    "id": "sepolia",
+    "name": "Sepolia Testnet",
+    "chainId": 11155111,
+    "symbol": "ETH",
+    "rpcUrl": "",
+    "wsRpcUrl": "",
+    "explorerUrl": "https://sepolia.etherscan.io",
+    "decimals": 18,
+    "isTestnet": true
+  }
+]
