@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../widgets/gradient_button.dart';
 import '../wallet/create_wallet/create_wallet_screen.dart';
 import '../wallet/import/import_wallet_screen.dart';
@@ -9,19 +10,20 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const SizedBox(height: 48),
-            const Text('Bienvenido a dex wallet', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+            Text(loc.translate('welcome_title'), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            const Text('Una wallet no-custodial premium para EVM. Protege tus llaves y controla tus fondos.'),
+            Text(loc.translate('welcome_subtitle')),
             const Spacer(),
-            GradientButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CreateWalletScreen())), child: const Text('Crear Wallet', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+            GradientButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CreateWalletScreen())), child: Text(loc.translate('create_wallet'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
             const SizedBox(height: 12),
-            OutlinedButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ImportWalletScreen())), child: const Text('Importar Wallet')),
+            OutlinedButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ImportWalletScreen())), child: Text(loc.translate('import_wallet'))),
             const SizedBox(height: 24),
           ]),
         ),

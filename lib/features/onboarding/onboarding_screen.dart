@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../widgets/gradient_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -29,20 +30,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
         child: Column(children: [
           Expanded(
             child: PageView(controller: _controller, onPageChanged: (i) => setState(() => _page = i), children: [
-              _pageItem('Seguridad', 'Tu seed nunca sale del dispositivo.'),
-              _pageItem('Control', 'Gestiona múltiples cuentas y redes.'),
-              _pageItem('Integraciones', 'Conecta DApps usando WalletConnect.'),
+              _pageItem(loc.translate('onboarding_security_title'), loc.translate('onboarding_security_body')),
+              _pageItem(loc.translate('onboarding_control_title'), loc.translate('onboarding_control_body')),
+              _pageItem(loc.translate('onboarding_integrations_title'), loc.translate('onboarding_integrations_body')),
             ]),
           ),
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Row(children: [
-              Expanded(child: GradientButton(onPressed: _next, child: Text(_page < 2 ? 'Siguiente' : 'Comenzar', style: const TextStyle(color: Colors.white)))),
+              Expanded(child: GradientButton(onPressed: _next, child: Text(_page < 2 ? loc.translate('next') : loc.translate('get_started'), style: const TextStyle(color: Colors.white)))),
             ]),
           )
         ]),
