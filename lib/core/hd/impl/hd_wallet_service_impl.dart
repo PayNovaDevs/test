@@ -81,27 +81,21 @@ class HdWalletServiceImpl implements HdWalletService {
 
   @override
   Future<String> signTransaction(String unsignedTxRlpHex, int index) async {
-    // For interoperability we accept a serialized RLP unsigned transaction hex (without 0x)
-    // and return the signed raw tx hex (with 0x).
-    // NOTE: Constructing and signing raw RLP tx is complex; here we assume the caller
-    // provides the unsigned RLP and chainId as part of the payload. This function
-    // attempts to sign the bytes using the private key.
-    final pkHex = await _getPrivateKeyHexForIndex(index);
-    final priv = hex.decode(pkHex);
-    final sig = crypto.sign(crypto.keccak(hex.decode(unsignedTxRlpHex)), Uint8List.fromList(priv));
-    // The above is a placeholder: proper transaction signing requires rlp and v/r/s calculation.
-    // For now throw to indicate unsupported direct-rlp signing in this simplified impl.
-    throw UnsupportedError('Direct RLP signing is not implemented in HdWalletServiceImpl. Use signWithTransactionParameters instead.');
+    // Deprecated: prefer signTransactionObject for robust signing.
+    throw UnsupportedError('Direct RLP signing is not supported. Use signTransactionObject.');
   }
 
   /// Higher level helper: sign a web3dart Transaction and return raw signed transaction hex.
-  Future<String> signWithTransactionParameters(Transaction tx, int index, int chainId) async {
+  @override
+  Future<String> signTransactionObject(dynamic tx, int index, int chainId) async {
     final pkHex = await _getPrivateKeyHexForIndex(index);
     final creds = EthPrivateKey.fromHex(pkHex);
-    // web3dart provides 'signTransaction' on Credentials via Client, but we can use
-    // TransactionEncoder to sign offline using 'credentials.signToSignature' flows.
-    // For simplicity, we'll use web3dart's 'signTransaction' helper available on EthPrivateKey.
-    final signed = await creds.signTransaction(tx, chainId: chainId);
+    // web3dart provides 'signTransaction' on Credentials via Client, but EthPrivateKey
+    // exposes 'sign' helpers. We'll use 'signTransaction' helper on EthPrivateKey which
+    // requires a Web3Client to compute chainId/gas etc. To keep this offline, rely on
+    // EthPrivateKey.signTransaction available in web3dart. If additional fields are required
+    // by the chain, ensure tx contains them (nonce, gasPrice or maxFeePerGas/maxPriorityFeePerGas).
+    final signed = await creds.signTransaction(tx as Transaction, chainId: chainId);
     return crypto.bytesToHex(signed, include0x: true);
   }
 }
